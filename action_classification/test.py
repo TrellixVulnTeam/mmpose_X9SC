@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from tools import read_pkl
+from tools import read_pkl, get_action_class
 from ADModel import ADModel
 import pandas as pd
 if __name__=="__main__":
@@ -24,9 +24,6 @@ if __name__=="__main__":
     # thr = [res[res.argmax()] for res in out]
     # print(thr)
 
-    l = {"action_class ":"aaa","scores":0.999,"box":[3,12,4,1]}
-    print(l.values())
-    a,b,c = l.values()
-    print(a,b,c)
-
+    c = get_action_class()
+    print(c[1])
 

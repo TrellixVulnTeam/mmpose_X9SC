@@ -6,7 +6,7 @@ from ADModel import ADModel
 
 def video_action_recognition(video_dir,is_show=False):
     det_model, pose_model = init_top_down_model()
-    model = torch.load("model_latest_test_acc_0.9888682745825603.pth")
+    model = torch.load("model_latest_test_acc_0.8589981447124304.pth")
     cap = cv2.VideoCapture(video_dir)
     window_name = "action recognition"
 
@@ -16,7 +16,7 @@ def video_action_recognition(video_dir,is_show=False):
                 int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         videoWriter = cv2.VideoWriter("output.mp4", fourcc, fps, size)
-
+    num_frame = 0
     while True:
         ret,frame = cap.read()
         if not ret:
@@ -24,11 +24,12 @@ def video_action_recognition(video_dir,is_show=False):
         img, pose_results = top_down_img(frame, det_model, pose_model)
         labels = model_process(pose_results, model)
         vis_action_label(img, labels)
+        num_frame += 1
         if is_show:
             cv2.imshow(window_name, img)
         else:
             videoWriter.write(img)
-
+        print("----------------process frame_num {}----------".format(num_frame))
         c = cv2.waitKey(1)
         if c & 0xFF == ord('q'):
             break

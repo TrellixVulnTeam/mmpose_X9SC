@@ -25,8 +25,8 @@ def parser_top_down_args():
     args.det_checkpoint = 'https://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_1x_coco-person/faster_rcnn_r50_fpn_1x_coco-person_20201216_175929-d022e227.pth'  # noqa: E501
     args.det_score_thr = 0.5
     args.det_cat_id = 1
-    args.bbox_thr = 0.3
-    args.kpt_thr = 0.3
+    args.bbox_thr = 0.5
+    args.kpt_thr = 0.5
     args.radius = 4
     args.thickness = 1
     assert has_mmdet, 'Please install mmdet to run the demo.'
