@@ -19,9 +19,14 @@ if __name__=="__main__":
     # for i in range(len(df)):
     #     label_list.update({df.loc[i]["num"]:df.loc[i]["class"]})
 
-    out = np.array([[0.3,0.4,0.5],[0.2,0.3,0.8],[0.1,0.4,0.6]])
-    index = np.array(out).argmax(1)
-    thr = [res[res.argmax()] for res in out]
-    print(thr)
+    # out = np.array([[0.3,0.4,0.5],[0.2,0.3,0.8],[0.1,0.4,0.6]])
+    # index = np.array(out).argmax(1)
+    # thr = [res[res.argmax()] for res in out]
+    # print(thr)
+
+    l = {"action_class ":"aaa","scores":0.999,"box":[3,12,4,1]}
+    print(l.values())
+    a,b,c = l.values()
+    print(a,b,c)
 
 

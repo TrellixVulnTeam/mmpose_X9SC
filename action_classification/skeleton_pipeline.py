@@ -4,6 +4,41 @@ from tools import process_img_skeleton_data, get_action_class, vis_action_label,
 import torch
 from ADModel import ADModel
 
+def video_action_recognition(video_dir,is_show=False):
+    det_model, pose_model = init_top_down_model()
+    model = torch.load("model_latest_test_acc_0.9888682745825603.pth")
+    cap = cv2.VideoCapture(video_dir)
+    window_name = "action recognition"
+
+    if not is_show:
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        videoWriter = cv2.VideoWriter("output.mp4", fourcc, fps, size)
+
+    while True:
+        ret,frame = cap.read()
+        if not ret:
+            break
+        img, pose_results = top_down_img(frame, det_model, pose_model)
+        labels = model_process(pose_results, model)
+        vis_action_label(img, labels)
+        if is_show:
+            cv2.imshow(window_name, img)
+        else:
+            videoWriter.write(img)
+
+        c = cv2.waitKey(1)
+        if c & 0xFF == ord('q'):
+            break
+    cap.release()
+    if is_show:
+        cv2.destroyAllWindows()
+    else:
+        videoWriter.release()
+
+
 if __name__=="__main__":
     #get skeleton data
     img = cv2.imread("123.jpg")

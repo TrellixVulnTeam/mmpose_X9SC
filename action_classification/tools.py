@@ -100,6 +100,8 @@ def model_process(pose_results,model):
     """
     # caculate distance
     dis_data = process_img_skeleton_data(pose_results)
+    if torch.cuda.is_available():
+        dis_data = dis_data.cuda()
     bbox = [data["bbox"] for data in pose_results]
     out = model(dis_data)
     out = out.cpu().detach().numpy()
@@ -108,7 +110,7 @@ def model_process(pose_results,model):
     labels = [dict(action_class=action_class[i],scores=res[i],box=box) for i,res,box in zip(res_index,out,bbox)]
     return labels
 
-def vis_action_label(img,labels,thr=0.7):
+def vis_action_label(img,labels,thr=0.9):
     """
     Args:
         img: cv2 image
@@ -116,10 +118,11 @@ def vis_action_label(img,labels,thr=0.7):
         thr: except object thr < 0.7
     Returns: img
     """
-    for action_class,scores,box in labels:
+    for label in labels:
+        action_class,scores,box = label["action_class"],label["scores"],label["box"]
         if scores > thr:
             x1, y1 = int(box[0]), int(box[1])
-            cv2.putText(img, action_class, (x1 + 20, y1 + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255), 2)
+            cv2.putText(img, action_class, (x1 + 20, y1 + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
 
 
 def read_pkl(file_dir):

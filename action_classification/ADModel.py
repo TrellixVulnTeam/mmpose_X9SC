@@ -80,8 +80,8 @@ class ADModel(nn.Module):
         return out
 
 if __name__=="__main__":
-    leaning_rate = 0.05
-    batch_size = 3
+    leaning_rate = 0.01
+    batch_size = 5
     device = device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = ADModel()
     Loss = nn.CrossEntropyLoss()
@@ -92,7 +92,7 @@ if __name__=="__main__":
         model.cuda()
         model.to(device)
     model.train()
-    num_epoch = 30
+    num_epoch = 60
     total_train_step = 0
     data = read_pkl("../train_v4.pkl")
     train_data = torch.tensor(data["keypoints"])
