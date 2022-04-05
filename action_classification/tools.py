@@ -6,15 +6,30 @@ import pandas as pd
 import pickle
 import numpy as np
 #1.获取文件名列表
+import torch
+
+
 def get_video_name(folder_dir):
+    """
+    返回folder_dir路径下的 所有文件名(绝对路径)
+    Args:
+        folder_dir: 文件夹路径
+    Returns: [file_dir1,file_dir1,...]  str
+    """
     video_names = os.listdir(folder_dir)
     video_names = [osp.join(folder_dir, vid_n) for vid_n in video_names]
     return video_names
 
 def process_img_skeleton_data(img_data):  #return everyone skeleton distance on image
+    """
+    计算关键点距离矩阵
+    Args:
+        img_data: top_down_img(img,det_model,pose_model) 的返回值，[{"bbox":[x1,x2,y1,y2,thr],"keypoints":[[k1x,k1y,thr],...]},.....]
+    Returns: dis_data (people_num,1,11,11)
+    """
     peoples_dis_matri = []
     for peopel_data in img_data:
-        kp = peopel_data["keypoints"][:11]
+        kp = peopel_data["keypoints"][:11] #只取上半身关键点
         dis_matri = []
         for kp1 in kp:
             dis = []
@@ -24,12 +39,12 @@ def process_img_skeleton_data(img_data):  #return everyone skeleton distance on 
                 dis.append(d)
             dis_matri.append(dis)
         peoples_dis_matri.append(dis_matri)
-    return peoples_dis_matri
+    dis_data = torch.tensor(peoples_dis_matri).reshape((-1, 1, 11, 11))
+    return dis_data
 
 def process_raw_train_skeleton():
     with open(r"C:\Users\radishi\Desktop\data\process_data\train.pkl","rb") as fo:
         skeleton_data = pickle.load(fo,encoding="bytes")
-
     for i,video_data in enumerate(skeleton_data):
         video_data = [ frame_data[:11 ] for frame_data in video_data["keypoints"]]
         #calculate skeleton distance
@@ -55,29 +70,56 @@ def data_match_lable():
     labels = []
     for video_data in dis_data:
         vid_label = int(video_data["label"])
-        keypoint_num = len(video_data["keypoints"])
-        #labels_ = np.zeros((keypoint_num, 4),dtype=int)  #generate one hot encoding
-        # for label in labels_:
-        #     label[vid_label-1] = 1
-        #     labels.append(label)
         for kp in video_data["keypoints"]:
             labels.append(vid_label-1)
             keypoints.append([kp])
-    #save keypoints labels
+    #save keypoints and labels
     save_pkl("train_v4.pkl",dict(labels=labels,keypoints=keypoints))
     return keypoints,labels
 
-def get_action_class():
+def get_action_class(class_dir="label_list.txt"):
+    """ 返回动作类别
+    Args:
+        class_dir: 文件路径 str
+    Returns:example : {"0":"sleep",....}
+    """
     label_name_list = {}
-    df = pd.read_csv("label_list.txt", sep=" ")
+    df = pd.read_csv(class_dir, sep=" ")
     for i in range(len(df)):
         label_name_list.update({df.loc[i]["num"]: df.loc[i]["class"]})
     return label_name_list
 
-def vis_action_label(img,bbox,labels):
-    for box,label in zip(bbox,labels):
-        x1,y1 = box[0],box[1]
-        cv2.putText(img,label,(x1+20,y1+20),cv2.FONT_HERSHEY_SIMPLEX,0.75,(0,0,255),2)
+def model_process(pose_results,model):
+    """
+    将距离矩阵数据模型做识别，并将识别结果  action_class(动作类别) scores(置信度) box(人体检测框)
+    Args:
+        dis_data: 距离矩阵
+        bbox:  检测框
+        model_dir: 模型路径
+    Returns: example: [{"action_class":"sleep","scores":0.892,"box":[x1,y1,x2,y2,sor]},...]
+    """
+    # caculate distance
+    dis_data = process_img_skeleton_data(pose_results)
+    bbox = [data["bbox"] for data in pose_results]
+    out = model(dis_data)
+    out = out.cpu().detach().numpy()
+    res_index = out.argmax(1)
+    action_class = get_action_class()
+    labels = [dict(action_class=action_class[i],scores=res[i],box=box) for i,res,box in zip(res_index,out,bbox)]
+    return labels
+
+def vis_action_label(img,labels,thr=0.7):
+    """
+    Args:
+        img: cv2 image
+        labels: [{"action_class":"sleep","scores":0.892,"box":[x1,y1,x2,y2,sor]},...]
+        thr: except object thr < 0.7
+    Returns: img
+    """
+    for action_class,scores,box in labels:
+        if scores > thr:
+            x1, y1 = int(box[0]), int(box[1])
+            cv2.putText(img, action_class, (x1 + 20, y1 + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255), 2)
 
 
 def read_pkl(file_dir):

@@ -14,8 +14,14 @@ if __name__=="__main__":
     # out = out.cpu().detach().numpy().argmax(1)
     # print(out)
 
-    label_list = {}
-    df = pd.read_csv("label_list.txt",sep=" ")
-    for i in range(len(df)):
-        label_list.update({df.loc[i]["num"]:df.loc[i]["class"]})
+    # label_list = {}
+    # df = pd.read_csv("label_list.txt",sep=" ")
+    # for i in range(len(df)):
+    #     label_list.update({df.loc[i]["num"]:df.loc[i]["class"]})
+
+    out = np.array([[0.3,0.4,0.5],[0.2,0.3,0.8],[0.1,0.4,0.6]])
+    index = np.array(out).argmax(1)
+    thr = [res[res.argmax()] for res in out]
+    print(thr)
+
 

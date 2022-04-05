@@ -44,6 +44,7 @@ def parser_bottom_up_args():
     return args
 
 def init_top_down_model():
+    #初始化模型 ，返回人体检测和姿态估计模型
     args = parser_top_down_args()
     assert args.det_config is not None
     assert args.det_checkpoint is not None
@@ -55,7 +56,14 @@ def init_top_down_model():
     return det_model,pose_model
 
 def top_down_img(image,det_model,pose_model):
+    """
+    Args:
+        image: cv2 img
+        det_model:
+        pose_model:
+    Returns:
 
+    """
     dataset = pose_model.cfg.data['test']['type']
     dataset_info = pose_model.cfg.data['test'].get('dataset_info', None)
     if dataset_info is None:
@@ -156,6 +164,10 @@ def get_video_name(folder_dir):
     return video_names
 
 def extract_pose_from_video():
+    """
+    从视频中提取骨骼数据，并将结果保存为图片
+    Returns:
+    """
     det_model,pose_model = init_top_down_model()
     video_names = get_video_name(r"/content/mmpose/data/train")
     train_data = []
@@ -168,7 +180,6 @@ def extract_pose_from_video():
         img_save_dir = video_name.split('.')[0]
         if not os.path.exists(img_save_dir):
             os.mkdir(img_save_dir)
-
         while True:
             ret,frame = cap.read()
             if not ret:
