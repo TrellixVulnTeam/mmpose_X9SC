@@ -80,7 +80,7 @@ class ADModel(nn.Module):
         return out
 
 if __name__=="__main__":
-    leaning_rate = 0.01
+    leaning_rate = 0.05
     batch_size = 5
     device = device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = ADModel()
@@ -92,10 +92,10 @@ if __name__=="__main__":
         model.cuda()
         model.to(device)
     model.train()
-    num_epoch = 60
+    num_epoch = 30
     total_train_step = 0
-    data = read_pkl("../train_v4.pkl")
-    train_data = torch.tensor(data["keypoints"])
+    data = read_pkl("train_v5.pkl")
+    train_data = torch.tensor(data["keypoints"],dtype=torch.float32)
     train_label = torch.tensor(data["labels"])
     for epoch in range(num_epoch):
         print("-------------training data {} epoch---------------".format(epoch+1))

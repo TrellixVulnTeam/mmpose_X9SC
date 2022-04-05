@@ -4,15 +4,17 @@ from tools import read_pkl, get_action_class
 from ADModel import ADModel
 import pandas as pd
 if __name__=="__main__":
-    # data = read_pkl("../train_v4.pkl")
-    # input = torch.tensor(data["keypoints"][200:210])
-    #
-    # input = input.cuda()
-    # label = data["labels"][200:210]
-    # model = torch.load("model_latest_test_acc_0.9888682745825603.pth")
-    # out = model(input)
-    # out = out.cpu().detach().numpy().argmax(1)
-    # print(out)
+    data = read_pkl("../train_v4.pkl")
+    input = torch.tensor(data["keypoints"][-140:-1])
+
+    input = input.cuda()
+    label = np.array(data["labels"][-140:-1])
+    model = torch.load("model_latest_test_acc_1.0.pth")
+    out = model(input)
+    out = out.cpu().detach().numpy().argmax(1)
+    print(out)
+    print(label)
+
 
     # label_list = {}
     # df = pd.read_csv("label_list.txt",sep=" ")
@@ -24,6 +26,5 @@ if __name__=="__main__":
     # thr = [res[res.argmax()] for res in out]
     # print(thr)
 
-    c = get_action_class()
-    print(c[1])
+
 

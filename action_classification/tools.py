@@ -5,6 +5,7 @@ import cv2
 import pandas as pd
 import pickle
 import numpy as np
+import copy
 #1.获取文件名列表
 import torch
 
@@ -60,7 +61,6 @@ def process_raw_train_skeleton():
                 dis_matri.append(dis)
             video_dis_matri.append(dis_matri)
         skeleton_data[i]["keypoints"] = video_dis_matri
-    print(skeleton_data[0])
     with open(r"train_v3.pkl","wb") as fo:
         pickle.dump(skeleton_data,fo)
 
@@ -135,9 +135,13 @@ def save_pkl(file_name,data):
         pickle.dump(data,fo)
 
 if __name__=="__main__":
-    data_match_lable()
-    data = read_pkl("train_v4.pkl")
-    print(np.array(data["labels"]).shape)
+
+    data = read_pkl("../train_v4.pkl")
+    kps = copy.deepcopy(data["keypoints"][-50:-1])
+    labels = copy.deepcopy(data["labels"][-50:-1])
+    l = np.append(data["labels"],labels)
+    k = np.append(data["keypoints"],kps,axis=0)
+    save_pkl("train_v5.pkl", dict(labels=l, keypoints=k))
 
 
 

@@ -6,7 +6,7 @@ from ADModel import ADModel
 
 def video_action_recognition(video_dir,is_show=False):
     det_model, pose_model = init_top_down_model()
-    model = torch.load("model_latest_test_acc_0.8589981447124304.pth")
+    model = torch.load("model_latest_test_acc_1.0.pth")
     cap = cv2.VideoCapture(video_dir)
     window_name = "action recognition"
 
