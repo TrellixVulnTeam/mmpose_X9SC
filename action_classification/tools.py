@@ -124,7 +124,6 @@ def vis_action_label(img,labels,thr=0.9):
             x1, y1 = int(box[0]), int(box[1])
             cv2.putText(img, action_class, (x1 + 20, y1 + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
 
-
 def read_pkl(file_dir):
     with open(file_dir,"rb") as fo:
         data = pickle.load(fo,encoding="bytes")
