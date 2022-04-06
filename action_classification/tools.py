@@ -110,7 +110,7 @@ def model_process(pose_results,model):
     labels = [dict(action_class=action_class[i],scores=res[i],box=box) for i,res,box in zip(res_index,out,bbox)]
     return labels
 
-def vis_action_label(img,labels,thr=0.7):
+def vis_action_label(img,labels,thr=0.9):
     """
     Args:
         img: cv2 image
